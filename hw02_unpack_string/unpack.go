@@ -12,32 +12,39 @@ var ErrInvalidString = errors.New("invalid string")
 func Unpack(input string) (string, error) {
 	var builder strings.Builder
 	var flagEscape bool
-	for i, char := range input {
+	var runeInput = []rune(input)
+	var stringLength = len(runeInput)
+	for i, char := range runeInput {
 		switch {
 		case string(char) == `\` && !flagEscape:
 			flagEscape = true
 		case flagEscape:
 			builder.WriteRune(char)
 			flagEscape = false
-		case unicode.IsDigit(char) && len(builder.String()) > 0:
+		case unicode.IsDigit(char) && builder.Len() > 0:
 			number, _ := strconv.Atoi(string(char))
 
 			if number == 0 {
-				if !unicode.IsDigit(rune(input[i-1])) {
-					str := []rune(builder.String())
-					str = str[:len(str)-1]
-					builder.Reset()
-					builder.WriteString(string(str))
-				} else {
+				if unicode.IsDigit(runeInput[i-1]) {
 					return "", ErrInvalidString
+				} else {
+					continue
 				}
+
 			} else {
-				w := []rune(builder.String())
-				w = w[len(w)-1:]
+				w := runeInput[i-1]
 				builder.WriteString(strings.Repeat(string(w), number-1))
 			}
 		case !unicode.IsDigit(char):
-			builder.WriteRune(char)
+			if i+1 <= stringLength {
+				w := string(char)
+				if i+1 < stringLength {
+					w = string(runeInput[i+1])
+				}
+				if w != "0" {
+					builder.WriteRune(char)
+				}
+			}
 		default:
 			return "", ErrInvalidString
 		}

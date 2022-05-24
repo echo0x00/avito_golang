@@ -1,4 +1,4 @@
-module github.com/savproga/hw02_unpack_string
+module github.com/echo0x00/hw02_unpack_string
 
 go 1.16
 
