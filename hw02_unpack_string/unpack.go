@@ -12,8 +12,8 @@ var ErrInvalidString = errors.New("invalid string")
 func Unpack(input string) (string, error) {
 	var builder strings.Builder
 	var flagEscape bool
-	var runeInput = []rune(input)
-	var stringLength = len(runeInput)
+	runeInput := []rune(input)
+	stringLength := len(runeInput)
 	for i, char := range runeInput {
 		switch {
 		case string(char) == `\` && !flagEscape:
@@ -27,10 +27,7 @@ func Unpack(input string) (string, error) {
 			if number == 0 {
 				if unicode.IsDigit(runeInput[i-1]) {
 					return "", ErrInvalidString
-				} else {
-					continue
 				}
-
 			} else {
 				w := runeInput[i-1]
 				builder.WriteString(strings.Repeat(string(w), number-1))
