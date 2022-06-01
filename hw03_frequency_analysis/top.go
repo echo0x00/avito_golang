@@ -11,7 +11,7 @@ type Pair struct {
 	count int
 }
 
-var reg = regexp.MustCompile(`[а-яА-Я\-]+`)
+var reg = regexp.MustCompile(`[^\r\n\t\f\v\s]+`)
 
 func Top10(input string) []string {
 	if len(input) == 0 {
@@ -22,6 +22,7 @@ func Top10(input string) []string {
 	res := reg.FindAllString(input, -1)
 	for i := range res {
 		word := strings.ToLower(res[i])
+		word = strings.Trim(word, ".,!?()'`»«:;")
 		if word != "-" {
 			words[word]++
 		}
@@ -39,13 +40,18 @@ func Top10(input string) []string {
 		return top[i].count > top[j].count
 	})
 
-	top10 := make([]string, 10)
+	lenList := len(top)
+	if lenList > 10 {
+		lenList = 10
+	}
+
+	topSlice := make([]string, 0, lenList)
 	for i, v := range top {
-		top10[i] = v.word
-		if i == 9 {
+		topSlice = append(topSlice, v.word)
+		if i == 9 || i > len(top) {
 			break
 		}
 	}
 
-	return top10
+	return topSlice
 }
