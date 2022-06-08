@@ -15,6 +15,19 @@ func TestList(t *testing.T) {
 		require.Nil(t, l.Back())
 	})
 
+	t.Run("diff types", func(t *testing.T) {
+		l := NewList()
+		l.PushFront("foo")
+		l.PushBack(1)
+		l.PushBack(.2)
+		l.PushBack("bar") // ["foo", 1, .2, "bar"]
+
+		require.Equal(t, 4, l.Len())
+
+		float := l.Back().Prev // .2
+		require.Equal(t, .2, float.Value)
+	})
+
 	t.Run("complex", func(t *testing.T) {
 		l := NewList()
 
