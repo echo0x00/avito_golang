@@ -35,7 +35,41 @@ func TestRun(t *testing.T) {
 		err := Run(tasks, workersCount, maxErrorsCount)
 
 		require.Truef(t, errors.Is(err, ErrErrorsLimitExceeded), "actual err - %v", err)
-		require.LessOrEqual(t, runTasksCount, int32(workersCount+maxErrorsCount), "extra tasks were started")
+		require.LessOrEqual(t, runTasksCount, int32(workersCount+maxErrorsCount), "были запущены лишние задачи")
+	})
+
+	t.Run("if maxCountErrors <= 0 return ErrErrorsLimitExceeded", func(t *testing.T) {
+		tasks := make([]Task, 0)
+
+		err := Run(tasks, 1, -1)
+		require.Truef(t, errors.Is(err, ErrErrorsLimitExceeded), "actual err - %v", err)
+
+		err = Run(tasks, 1, 0)
+		require.Truef(t, errors.Is(err, ErrErrorsLimitExceeded), "actual err - %v", err)
+	})
+
+	t.Run("asterisk task test", func(t *testing.T) {
+		tasksCount := 15
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			tasks = append(tasks, func() error {
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
+
+		workersCount := 5
+		maxErrorsCount := 1
+		err := Run(tasks, workersCount, maxErrorsCount)
+
+		require.Eventually(t, func() bool {
+			return runTasksCount == int32(tasksCount)
+		}, time.Second*2, time.Millisecond*time.Duration(rand.Intn(100)))
+		require.Equal(t, runTasksCount, int32(tasksCount), "Eventually тест: не все задания выполнены")
+		require.NoError(t, err)
 	})
 
 	t.Run("tasks without errors", func(t *testing.T) {
@@ -64,7 +98,7 @@ func TestRun(t *testing.T) {
 		elapsedTime := time.Since(start)
 		require.NoError(t, err)
 
-		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
-		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
+		require.Equal(t, runTasksCount, int32(tasksCount), "не все задания выполнены")
+		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "задачи выполнялись последовательно?")
 	})
 }
