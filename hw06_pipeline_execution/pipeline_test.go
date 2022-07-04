@@ -2,6 +2,7 @@ package hw06pipelineexecution
 
 import (
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -59,6 +60,59 @@ func TestPipeline(t *testing.T) {
 			int64(elapsed),
 			// ~0.8s for processing 5 values in 4 stages (100ms every) concurrently
 			int64(sleepPerStage)*int64(len(stages)+len(data)-1)+int64(fault))
+	})
+
+	stringStages := []Stage{
+		g("Lower case", func(v interface{}) interface{} { return strings.ToLower(v.(string)) }),
+		g("Append string", func(v interface{}) interface{} { return v.(string) + " golang awesome" }),
+		g("Upper case", func(v interface{}) interface{} { return strings.ToUpper(v.(string)) }),
+	}
+
+	t.Run("strings case", func(t *testing.T) {
+		in := make(Bi)
+		data := []string{"test", "this", "code"}
+
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		result := make([]string, 0, 10)
+		start := time.Now()
+		for s := range ExecutePipeline(in, nil, stringStages...) {
+			result = append(result, s.(string))
+		}
+		elapsed := time.Since(start)
+
+		require.Equal(t, []string{"TEST GOLANG AWESOME", "THIS GOLANG AWESOME", "CODE GOLANG AWESOME"}, result)
+		require.Less(t,
+			int64(elapsed),
+			// ~0.8s for processing 5 values in 4 stages (100ms every) concurrently
+			int64(sleepPerStage)*int64(len(stages)+len(data)-1)+int64(fault))
+	})
+
+	t.Run("instant done", func(t *testing.T) {
+		in := make(Bi)
+		done := make(Bi)
+		data := []int{1, 2, 3, 4, 5}
+
+		close(done)
+
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		result := make([]string, 0, 10)
+		for s := range ExecutePipeline(in, done, stages...) {
+			result = append(result, s.(string))
+		}
+
+		require.Len(t, result, 0)
 	})
 
 	t.Run("done case", func(t *testing.T) {
