@@ -6,8 +6,6 @@ import (
 	"math"
 )
 
-var progress int = 0
-
 type Progress struct {
 	currentPercent float64
 	total          int64
