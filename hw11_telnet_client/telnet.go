@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"io"
@@ -60,9 +59,7 @@ func (t *Telnet) Close() error {
 }
 
 func (t *Telnet) Send() error {
-	writer := bufio.NewWriter(t.conn)
-
-	if _, err := io.Copy(writer, t.in); err != nil && !errors.Is(err, io.EOF) {
+	if _, err := io.Copy(t.conn, t.in); err != nil && !errors.Is(err, io.EOF) {
 		t.cancelFunc()
 		return err
 	}
@@ -71,9 +68,7 @@ func (t *Telnet) Send() error {
 }
 
 func (t *Telnet) Receive() error {
-	reader := bufio.NewReader(t.conn)
-
-	if _, err := io.Copy(t.out, reader); err != nil && !errors.Is(err, io.EOF) {
+	if _, err := io.Copy(t.out, t.conn); err != nil && !errors.Is(err, io.EOF) {
 		t.cancelFunc()
 		return err
 	}
