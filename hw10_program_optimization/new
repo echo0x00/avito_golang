@@ -1,0 +1,11 @@
+goos: darwin
+goarch: amd64
+pkg: github.com/echo0x00/avito_golang/hw10_program_optimization
+cpu: Intel(R) Core(TM) i5-10600 CPU @ 3.30GHz
+BenchmarkGetDomainStat-12    	 1651927	       635.5 ns/op	    4167 B/op	       3 allocs/op
+BenchmarkGetDomainStat-12    	 1579238	       644.2 ns/op	    4167 B/op	       3 allocs/op
+BenchmarkGetDomainStat-12    	 1548526	       700.8 ns/op	    4167 B/op	       3 allocs/op
+BenchmarkGetDomainStat-12    	 1728549	       625.6 ns/op	    4166 B/op	       3 allocs/op
+BenchmarkGetDomainStat-12    	 1851972	       670.5 ns/op	    4166 B/op	       3 allocs/op
+PASS
+ok  	github.com/echo0x00/avito_golang/hw10_program_optimization	16.268s
