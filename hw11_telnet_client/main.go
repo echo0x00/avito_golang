@@ -71,6 +71,6 @@ func main() {
 		log.Println("done by context")
 		cancelFunc()
 		client.Close()
+	default:
 	}
-
 }
