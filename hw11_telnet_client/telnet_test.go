@@ -71,9 +71,10 @@ func TestTelnetClientTimeout(t *testing.T) {
 	out := &bytes.Buffer{}
 	timeout := 10 * time.Millisecond
 
-	unavailableAddr := "99.255.0.0:8080"
+	l, err := net.Listen("tcp", "127.0.0.1:")
+	require.NoError(t, err)
 	_, cancelFunc := context.WithCancel(context.Background())
 
-	client := NewTelnetClient(unavailableAddr, timeout, ioutil.NopCloser(in), out, cancelFunc)
+	client := NewTelnetClient(l.Addr().String(), timeout, ioutil.NopCloser(in), out, cancelFunc)
 	require.Error(t, client.Connect())
 }

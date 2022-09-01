@@ -53,8 +53,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "...Connection was closed by peer\n")
 	}()
 
-	wg.Add(1)
-
 	go func() {
 		defer wg.Done()
 		err := client.Send()
