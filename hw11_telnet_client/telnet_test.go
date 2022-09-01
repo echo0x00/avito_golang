@@ -69,7 +69,7 @@ func TestTelnetClient(t *testing.T) {
 func TestTelnetClientTimeout(t *testing.T) {
 	in := &bytes.Buffer{}
 	out := &bytes.Buffer{}
-	timeout := 10 * time.Millisecond
+	timeout := time.Nanosecond
 
 	l, err := net.Listen("tcp", "127.0.0.1:")
 	require.NoError(t, err)

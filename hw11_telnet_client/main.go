@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func main() {
 	address := net.JoinHostPort(host, port)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	signal.NotifyContext(ctx, os.Interrupt)
+	signal.NotifyContext(ctx, os.Interrupt, syscall.SIGINT)
 
 	client := NewTelnetClient(net.JoinHostPort(host, port), timeout, os.Stdin, os.Stdout, cancelFunc)
 	if err := client.Connect(); err != nil {

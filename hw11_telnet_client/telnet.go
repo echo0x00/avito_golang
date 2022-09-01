@@ -62,12 +62,8 @@ func (t *Telnet) Close() error {
 func (t *Telnet) Send() error {
 	writer := bufio.NewWriter(t.conn)
 
-	if writer.Size() < 0 {
-		t.cancelFunc()
-		return nil
-	}
-
 	if _, err := io.Copy(writer, t.in); err != nil && !errors.Is(err, io.EOF) {
+		t.cancelFunc()
 		return err
 	}
 
@@ -77,12 +73,8 @@ func (t *Telnet) Send() error {
 func (t *Telnet) Receive() error {
 	reader := bufio.NewReader(t.conn)
 
-	if reader.Size() < 0 {
-		t.cancelFunc()
-		return nil
-	}
-
 	if _, err := io.Copy(t.out, reader); err != nil && !errors.Is(err, io.EOF) {
+		t.cancelFunc()
 		return err
 	}
 
